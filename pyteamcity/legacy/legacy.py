@@ -379,14 +379,14 @@ class TeamCity:
 
     def trigger_build(
             self,
-            build_type_id, branch=None,
+            build_type_id, queue_at_top=False, branch=None,
             comment=None, parameters=None, agent_id=None):
         """
         Trigger a new build
         """
         url = _build_url('buildQueue', base_url=self.base_url)
         data = self._get_build_node(
-            build_type_id, branch,
+            build_type_id, queue_at_top, branch,
             comment, parameters, agent_id)
 
         response = self._post(
@@ -400,7 +400,7 @@ class TeamCity:
 
     def _get_build_node(
             self,
-            build_type_id, branch=None,
+            build_type_id, queue_at_top=False, branch=None,
             comment=None, parameters=None, agent_id=None):
         build_attributes = ''
 
@@ -413,6 +413,9 @@ class TeamCity:
             data = '<build>\n'
 
         data += '    <buildType id="%s"/>\n' % build_type_id
+
+        if queue_at_top:
+            data += '    <triggeringOptions queueAtTop="true"/>\n'
 
         if agent_id:
             data += '    <agent id="%s"/>\n' % agent_id
